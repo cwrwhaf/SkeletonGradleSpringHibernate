@@ -1,0 +1,92 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'war'
+apply plugin: 'cargo'
+
+sourceCompatibility = 1.8
+version = '1.0'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Quickstart', 'Implementation-Version': version
+    }
+}
+war {
+baseName="skeleton"
+version = null
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+buildscript {
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+
+   
+
+    /** Build Script Dependencies */
+    dependencies {
+ 
+        classpath 'org.gradle.api.plugins:gradle-cargo-plugin:1.5'
+    }
+}
+
+
+
+dependencies {
+    compile 'commons-collections:commons-collections:3.2'
+    compile 'org.hsqldb:hsqldb:2.3.2'
+    compile 'org.hibernate:hibernate-core:4.3.8.Final'
+    compile 'org.springframework:spring-orm:4.1.5.RELEASE'
+    compile 'org.springframework:spring-context:4.1.5.RELEASE'
+    compile 'org.springframework:spring-core:4.1.5.RELEASE'
+    compile 'org.springframework:spring-beans:4.1.5.RELEASE'
+    compile 'org.springframework:spring-web:4.1.5.RELEASE'
+    
+    compile 'com.sun.jersey.contribs:jersey-spring:1.19'
+   
+    compile 'com.sun.jersey:jersey-core:1.8'
+    compile 'com.sun.jersey:jersey-server:1.8'
+    compile 'com.sun.jersey:jersey-json:1.8'
+    
+    
+    
+     compile 'com.wordnik:swagger-jersey-jaxrs_2.10:1.3.7'
+    
+    testCompile 'junit:junit:4.+'
+    testCompile 'org.springframework:spring-test:4.1.5.RELEASE'
+}
+
+test {
+    systemProperties 'property': 'value'
+}
+
+
+
+cargo {
+    containerId = 'tomcat7x'
+    port = 8585
+    timeout = 250000
+    local {
+        installer {
+            installUrl = 'http://mirror.ventraip.net.au/apache/tomcat/tomcat-7/v7.0.59/bin/apache-tomcat-7.0.59.zip'
+            downloadDir = file("${rootProject.buildDir}/download")
+            extractDir = file("${rootProject.buildDir}/extract")
+        }
+        jvmArgs = "-Xms2048M -Xmx2048M -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9999"
+    }
+    deployable {
+        file = file("${buildDir}/libs/${war.baseName}.war")
+        //file = file("${buildDir}/libs/Skeleton-1.0.war")
+        context = war.baseName
+    }
+    
+}
+cargoRunLocal.dependsOn(war)
+cargoStartLocal.dependsOn(war)
